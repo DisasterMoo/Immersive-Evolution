@@ -1,0 +1,13 @@
+[
+  {
+    "modid": "immersiveevolution",
+    "name": "Immersive Evolution",
+    "description": "Adds progressive evolutionary chain of machines to Immersive Engineering",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://github.com/DisasterMoo/Immersive-Evolution",
+    "credits": "",
+    "logoFile": "",
+    "screenshots": []
+  }
+]
