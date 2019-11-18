@@ -1,6 +1,6 @@
 # Immersive Evolution
 
-Immersive Evolution is an addon for Immersive Engineering, adds more blocks, machines, devices and other stuff
+Addon for Immersive Engineering
 
 **Work in progress.**
 
