@@ -9,6 +9,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
+import disastermoo.immersiveevolution.common.EvolutionContent;
+
 @SuppressWarnings("WeakerAccess")
 @Mod(modid = ImmersiveEvolution.MOD_ID, name = ImmersiveEvolution.NAME, version = ImmersiveEvolution.VERSION, dependencies = "required-after:immersiveengineering@[0.12,);", certificateFingerprint = ImmersiveEvolution.SIGNING_KEY)
 public class ImmersiveEvolution
@@ -55,6 +57,7 @@ public class ImmersiveEvolution
     {
         // TOP initialization (if present) todo
         //FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "tfctech.compat.waila.TOPPlugin");
+        EvolutionContent.init();
     }
 
     @EventHandler
