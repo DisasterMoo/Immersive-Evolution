@@ -15,7 +15,16 @@ import static disastermoo.immersiveevolution.ImmersiveEvolution.MOD_ID;
 @Mod.EventBusSubscriber(modid = MOD_ID)
 public final class EvolutionContent
 {
-    public static BlockIEBase<BlockTypes_MetalMultiblock> MULTIBLOCKS = new TieredMultiblocks();
+    public static BlockIEBase<BlockTypes_MetalMultiblock> MULTIBLOCKS;
+
+    static
+    {
+        MULTIBLOCKS = new TieredMultiblocks();
+    }
+
+    public static void preInit()
+    {
+    }
 
     public static void init()
     {

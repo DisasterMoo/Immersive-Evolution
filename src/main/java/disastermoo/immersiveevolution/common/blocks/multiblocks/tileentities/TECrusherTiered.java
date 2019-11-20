@@ -34,7 +34,6 @@ import blusunrize.immersiveengineering.api.crafting.CrusherRecipe;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IAdvancedCollisionBounds;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IAdvancedSelectionBounds;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.ISoundTile;
-import blusunrize.immersiveengineering.common.blocks.metal.TileEntityMultiblockMetal;
 import blusunrize.immersiveengineering.common.util.IEDamageSources;
 import blusunrize.immersiveengineering.common.util.IESounds;
 import blusunrize.immersiveengineering.common.util.Utils;
@@ -45,7 +44,7 @@ import mcp.MethodsReturnNonnullByDefault;
 @SuppressWarnings("WeakerAccess")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TECrusherTiered extends TileEntityMultiblockMetal<TECrusherTiered, CrusherRecipe> implements ISoundTile, IAdvancedSelectionBounds, IAdvancedCollisionBounds
+public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> implements ISoundTile, IAdvancedSelectionBounds, IAdvancedCollisionBounds
 {
     public List<ItemStack> inputs = new ArrayList<>();
     public float animation_barrelRotation = 0;
@@ -124,7 +123,7 @@ public class TECrusherTiered extends TileEntityMultiblockMetal<TECrusherTiered, 
             ImmersiveEngineering.proxy.handleTileSound(IESounds.crusher, this, active, .5f, 1);
             if (active)
             {
-                animation_barrelRotation += 9f * tier;
+                animation_barrelRotation += 18f;
                 animation_barrelRotation %= 360f;
             }
         }

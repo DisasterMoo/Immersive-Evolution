@@ -72,5 +72,6 @@ public class ImmersiveEvolution
         {
             logger.error("INVALID FINGERPRINT DETECTED! This means this jar file has been compromised and are not supported.");
         }
+        EvolutionContent.preInit();
     }
 }
