@@ -25,6 +25,8 @@ import blusunrize.immersiveengineering.common.blocks.metal.BlockTypes_MetalDecor
 import blusunrize.immersiveengineering.common.blocks.metal.BlockTypes_MetalDecoration1;
 import blusunrize.immersiveengineering.common.blocks.metal.BlockTypes_MetalMultiblock;
 import blusunrize.immersiveengineering.common.util.Utils;
+import disastermoo.immersiveevolution.ImmersiveEvolution;
+import disastermoo.immersiveevolution.common.EvolutionContent;
 import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TECrusherTiered;
 import mcp.MethodsReturnNonnullByDefault;
 
@@ -40,16 +42,6 @@ public abstract class MultiblockCrusherTiered implements MultiblockHandler.IMult
             case 1:
             default:
                 return CrusherMk1.INSTANCE;
-        }
-    }
-
-    public static int[] getStructureDimensions(int tier)
-    {
-        switch (tier)
-        {
-            case 1:
-            default:
-                return new int[] {3, 3, 5};
         }
     }
 
@@ -73,9 +65,15 @@ public abstract class MultiblockCrusherTiered implements MultiblockHandler.IMult
         }
     }
 
+    public static int getTiers()
+    {
+        return 1;
+    }
+
     @Override
     public boolean isBlockTrigger(IBlockState state)
     {
+        ImmersiveEvolution.getLog().warn("TESTING = " + (state.getBlock() == IEContent.blockMetalDecoration1 && (state.getBlock().getMetaFromState(state) == BlockTypes_MetalDecoration1.STEEL_FENCE.getMeta())));
         return state.getBlock() == IEContent.blockMetalDecoration1 && (state.getBlock().getMetaFromState(state) == BlockTypes_MetalDecoration1.STEEL_FENCE.getMeta());
     }
 
@@ -84,16 +82,17 @@ public abstract class MultiblockCrusherTiered implements MultiblockHandler.IMult
     {
         if (side.getAxis() == EnumFacing.Axis.Y)
             return false;
+
         BlockPos startPos = pos;
         side = side.getOpposite();
-
+        ImmersiveEvolution.getLog().warn("PART 1");
         if (Utils.isOreBlockAt(world, startPos.add(0, -1, 0), "scaffoldingSteel")
                 && Utils.isBlockAt(world, startPos.offset(side, 2).add(0, -1, 0), IEContent.blockMetalDecoration0, BlockTypes_MetalDecoration0.LIGHT_ENGINEERING.getMeta()))
         {
             startPos = startPos.offset(side, 2);
             side = side.getOpposite();
         }
-
+        ImmersiveEvolution.getLog().warn("PART 2");
         boolean mirrored = false;
         boolean b = structureCheck(world, startPos, side, mirrored);
         if (!b)
@@ -101,13 +100,15 @@ public abstract class MultiblockCrusherTiered implements MultiblockHandler.IMult
             mirrored = true;
             b = structureCheck(world, startPos, side, mirrored);
         }
+        ImmersiveEvolution.getLog().warn("PART 3");
         if (!b)
             return false;
+        ImmersiveEvolution.getLog().warn("PART 4");
         ItemStack hammer = player.getHeldItemMainhand().getItem().getToolClasses(player.getHeldItemMainhand()).contains(Lib.TOOL_HAMMER) ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
         if (MultiblockHandler.fireMultiblockFormationEventPost(player, this, pos, hammer).isCanceled())
             return false;
-
-        IBlockState state = IEContent.blockMetalMultiblock.getStateFromMeta(BlockTypes_MetalMultiblock.CRUSHER.getMeta());
+        ImmersiveEvolution.getLog().warn("PART 5");
+        IBlockState state = EvolutionContent.MULTIBLOCKS.getStateFromMeta(BlockTypes_MetalMultiblock.CRUSHER.getMeta());
         state = state.withProperty(IEProperties.FACING_HORIZONTAL, side);
         for (int l = 0; l < 3; l++)
             for (int w = -2; w <= 2; w++)
@@ -128,9 +129,10 @@ public abstract class MultiblockCrusherTiered implements MultiblockHandler.IMult
                         tile.offset = new int[] {(side == EnumFacing.WEST ? -l + 1 : side == EnumFacing.EAST ? l - 1 : side == EnumFacing.NORTH ? ww : -ww), h, (side == EnumFacing.NORTH ? -l + 1 : side == EnumFacing.SOUTH ? l - 1 : side == EnumFacing.EAST ? ww : -ww)};
                         tile.mirrored = mirrored;
                         tile.markDirty();
-                        world.addBlockEvent(pos2, IEContent.blockMetalMultiblock, 255, 0);
+                        world.addBlockEvent(pos2, EvolutionContent.MULTIBLOCKS, 255, 0);
                     }
                 }
+        ImmersiveEvolution.getLog().warn("PART 6");
         return b;
     }
 

@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.client.ClientUtils;
-import blusunrize.immersiveengineering.common.IEContent;
+import disastermoo.immersiveevolution.common.EvolutionContent;
 import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TECrusherTiered;
 
 @SideOnly(Side.CLIENT)
@@ -28,7 +28,7 @@ public class TESRCrusherTiered extends TileEntitySpecialRenderer<TECrusherTiered
         final BlockRendererDispatcher blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
         BlockPos blockPos = te.getPos();
         IBlockState state = getWorld().getBlockState(blockPos);
-        if (state.getBlock() != IEContent.blockMetalMultiblock)
+        if (state.getBlock() != EvolutionContent.MULTIBLOCKS)
             return;
         //noinspection deprecation
         state = state.getBlock().getActualState(state, getWorld(), blockPos);

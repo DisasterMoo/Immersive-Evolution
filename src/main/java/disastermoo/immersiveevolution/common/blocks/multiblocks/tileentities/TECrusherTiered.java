@@ -59,7 +59,7 @@ public class TECrusherTiered extends TileEntityMultiblockMetal<TECrusherTiered, 
 
     public TECrusherTiered(int tier)
     {
-        super(MultiblockCrusherTiered.getInstance(tier), MultiblockCrusherTiered.getStructureDimensions(tier), MultiblockCrusherTiered.getEnergyCapacity(tier), true);
+        super(MultiblockCrusherTiered.getInstance(tier), new int[] {3, 3, 5}, MultiblockCrusherTiered.getEnergyCapacity(tier), true);
         this.tier = tier;
     }
 
