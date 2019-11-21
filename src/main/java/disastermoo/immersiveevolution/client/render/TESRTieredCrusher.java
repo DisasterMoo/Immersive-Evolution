@@ -14,13 +14,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import disastermoo.immersiveevolution.common.EvolutionContent;
-import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TECrusherTiered;
+import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TETieredCrusher;
 
 @SideOnly(Side.CLIENT)
-public class TESRCrusherTiered extends TileEntitySpecialRenderer<TECrusherTiered>
+public class TESRTieredCrusher extends TileEntitySpecialRenderer<TETieredCrusher>
 {
     @Override
-    public void render(TECrusherTiered te, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
+    public void render(TETieredCrusher te, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
     {
         if (!te.formed || te.isDummy() || !te.getWorld().isBlockLoaded(te.getPos(), false))
             return;

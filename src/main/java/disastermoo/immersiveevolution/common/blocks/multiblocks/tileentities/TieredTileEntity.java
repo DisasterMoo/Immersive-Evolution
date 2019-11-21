@@ -10,20 +10,25 @@ import blusunrize.immersiveengineering.api.crafting.IMultiblockRecipe;
 import blusunrize.immersiveengineering.common.blocks.metal.TileEntityMultiblockMetal;
 import disastermoo.immersiveevolution.EvolutionConfig;
 
-public abstract class TETiered<T extends TETiered<T, R>, R extends IMultiblockRecipe> extends TileEntityMultiblockMetal<T, R>
+@SuppressWarnings("WeakerAccess")
+public abstract class TieredTileEntity<T extends TieredTileEntity<T, R>, R extends IMultiblockRecipe> extends TileEntityMultiblockMetal<T, R>
 {
     protected int cooldownRunOutEnergy;
+    protected int tier;
 
-    public TETiered(MultiblockHandler.IMultiblock multiblockInstance, int[] structureDimensions, int energyCapacity, boolean redstoneControl)
+    public TieredTileEntity(MultiblockHandler.IMultiblock multiblockInstance, int[] structureDimensions, int energyCapacity, boolean redstoneControl, int tier)
     {
         super(multiblockInstance, structureDimensions, energyCapacity, redstoneControl);
+        this.tier = tier;
         cooldownRunOutEnergy = 0;
+
     }
 
     @Override
     public void readCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
         super.readCustomNBT(nbt, descPacket);
+        this.tier = nbt.getInteger("tier");
         cooldownRunOutEnergy = nbt.getInteger("cooldownRunOutEnergy");
     }
 
@@ -31,6 +36,7 @@ public abstract class TETiered<T extends TETiered<T, R>, R extends IMultiblockRe
     public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
         super.writeCustomNBT(nbt, descPacket);
+        nbt.setInteger("tier", tier);
         nbt.setInteger("cooldownRunOutEnergy", cooldownRunOutEnergy);
     }
 
@@ -54,6 +60,7 @@ public abstract class TETiered<T extends TETiered<T, R>, R extends IMultiblockRe
             {
                 process.doProcessTick(this);
                 tickedProcesses++;
+                //noinspection ConstantConditions
                 updateMasterBlock(null, true);
             }
             else if (this.energyStorage.extractEnergy(process.energyPerTick, true) < process.energyPerTick)

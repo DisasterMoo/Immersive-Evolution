@@ -11,16 +11,16 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import blusunrize.immersiveengineering.api.Lib;
-import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TECrusherTiered;
+import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TETieredCrusher;
 
 import static disastermoo.immersiveevolution.ImmersiveEvolution.MOD_ID;
 
 @Mod.EventBusSubscriber(modid = MOD_ID)
 public final class EventHandler
 {
-    private static HashMap<UUID, TECrusherTiered> crusherMap = new HashMap<>();
+    private static HashMap<UUID, TETieredCrusher> crusherMap = new HashMap<>();
 
-    public static void addCrushingEntity(EntityLivingBase entity, TECrusherTiered te)
+    public static void addCrushingEntity(EntityLivingBase entity, TETieredCrusher te)
     {
         crusherMap.put(entity.getUniqueID(), te);
     }
@@ -30,7 +30,7 @@ public final class EventHandler
     {
         if (!event.isCanceled() && Lib.DMG_Crusher.equals(event.getSource().getDamageType()))
         {
-            TECrusherTiered crusher = crusherMap.get(event.getEntityLiving().getUniqueID());
+            TETieredCrusher crusher = crusherMap.get(event.getEntityLiving().getUniqueID());
             if (crusher != null)
             {
                 for (EntityItem item : event.getDrops())

@@ -7,8 +7,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import disastermoo.immersiveevolution.client.render.TESRCrusherTiered;
-import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TECrusherTiered;
+import disastermoo.immersiveevolution.client.render.TESRTieredCrusher;
+import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TETieredCrusher;
 
 import static disastermoo.immersiveevolution.ImmersiveEvolution.MOD_ID;
 
@@ -20,6 +20,6 @@ public final class ClientRegisterEvents
     public static void registerModels(ModelRegistryEvent event)
     {
         // TESRs //
-        ClientRegistry.bindTileEntitySpecialRenderer(TECrusherTiered.class, new TESRCrusherTiered());
+        ClientRegistry.bindTileEntitySpecialRenderer(TETieredCrusher.class, new TESRTieredCrusher());
     }
 }

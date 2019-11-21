@@ -30,36 +30,34 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import blusunrize.immersiveengineering.ImmersiveEngineering;
-import blusunrize.immersiveengineering.api.crafting.CrusherRecipe;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IAdvancedCollisionBounds;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IAdvancedSelectionBounds;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.ISoundTile;
 import blusunrize.immersiveengineering.common.util.IEDamageSources;
 import blusunrize.immersiveengineering.common.util.IESounds;
 import blusunrize.immersiveengineering.common.util.Utils;
+import disastermoo.immersiveevolution.api.crafting.TieredCrusherRecipe;
 import disastermoo.immersiveevolution.common.EventHandler;
-import disastermoo.immersiveevolution.common.blocks.multiblocks.MultiblockCrusherTiered;
+import disastermoo.immersiveevolution.common.blocks.multiblocks.TieredCrusher;
 import mcp.MethodsReturnNonnullByDefault;
 
 @SuppressWarnings("WeakerAccess")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> implements ISoundTile, IAdvancedSelectionBounds, IAdvancedCollisionBounds
+public class TETieredCrusher extends TieredTileEntity<TETieredCrusher, TieredCrusherRecipe> implements ISoundTile, IAdvancedSelectionBounds, IAdvancedCollisionBounds
 {
     public List<ItemStack> inputs = new ArrayList<>();
     public float animation_barrelRotation = 0;
     protected IItemHandler insertionHandler = new MultiblockInventoryHandler_DirectProcessing(this).setProcessStacking(true);
-    private int tier;
 
-    public TECrusherTiered()
+    public TETieredCrusher()
     {
         this(1);
     }
 
-    public TECrusherTiered(int tier)
+    public TETieredCrusher(int tier)
     {
-        super(MultiblockCrusherTiered.getInstance(tier), new int[] {3, 3, 5}, MultiblockCrusherTiered.getEnergyCapacity(tier), true);
-        this.tier = tier;
+        super(TieredCrusher.getInstance(tier), new int[] {3, 3, 5}, TieredCrusher.getEnergyCapacity(tier), true, tier);
     }
 
     @Override
@@ -89,9 +87,51 @@ public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> im
     }
 
     @Override
-    protected CrusherRecipe readRecipeFromNBT(NBTTagCompound tag)
+    public void onEntityCollision(World world, Entity entity)
     {
-        return CrusherRecipe.loadFromNBT(tag);
+        boolean bpos = pos == 16 || pos == 17 || pos == 18 || pos == 21 || pos == 22 || pos == 23 || pos == 26 || pos == 27 || pos == 28;
+        if (bpos && !world.isRemote && entity != null && !entity.isDead && !isRSDisabled())
+        {
+            TETieredCrusher master = master();
+            if (master == null)
+                return;
+            Vec3d center = new Vec3d(master.getPos()).add(.5, .75, .5);
+            AxisAlignedBB crusherInternal = new AxisAlignedBB(center.x - 1.0625, center.y, center.z - 1.0625, center.x + 1.0625, center.y + 1.25, center.z + 1.0625);
+            if (!entity.getEntityBoundingBox().intersects(crusherInternal))
+                return;
+            if (entity instanceof EntityItem && !((EntityItem) entity).getItem().isEmpty())
+            {
+                ItemStack stack = ((EntityItem) entity).getItem();
+                if (stack.isEmpty())
+                {
+                    return;
+                }
+                TieredCrusherRecipe recipe = master.findRecipeForInsertion(stack);
+                if (recipe == null)
+                {
+                    return;
+                }
+                ItemStack displayStack = recipe.getDisplayStack(stack);
+                MultiblockProcess<TieredCrusherRecipe> process = new MultiblockProcessInWorld<>(recipe, .5f, Utils.createNonNullItemStackListFromItemStack(displayStack));
+                if (master.addProcessToQueue(process, true, true))
+                {
+                    master.addProcessToQueue(process, false, true);
+                    stack.shrink(displayStack.getCount());
+                    if (stack.getCount() <= 0)
+                        entity.setDead();
+                }
+            }
+            else if (entity instanceof EntityLivingBase && (!(entity instanceof EntityPlayer) || !((EntityPlayer) entity).capabilities.disableDamage))
+            {
+                int consumed = master.energyStorage.extractEnergy(80, true);
+                if (consumed > 0)
+                {
+                    master.energyStorage.extractEnergy(consumed, false);
+                    EventHandler.addCrushingEntity((EntityLivingBase) entity, master);
+                    entity.attackEntityFrom(IEDamageSources.crusher, consumed / 20f);
+                }
+            }
+        }
     }
 
     @Override
@@ -136,12 +176,20 @@ public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> im
         return null;
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
-    @Nullable
-    public CrusherRecipe findRecipeForInsertion(ItemStack inserting)
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
-        return CrusherRecipe.findRecipe(inserting);
+        if (pos > 30 && pos < 44 && pos % 5 > 0 && pos % 5 < 4 && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        {
+            TETieredCrusher master = master();
+            if (master != null)
+            {
+                //noinspection unchecked
+                return (T) master.insertionHandler;
+            }
+            return null;
+        }
+        return super.getCapability(capability, facing);
     }
 
     @Override
@@ -158,10 +206,11 @@ public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> im
         return null;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
-    public boolean additionalCanProcessCheck(MultiblockProcess<CrusherRecipe> process)
+    protected TieredCrusherRecipe readRecipeFromNBT(NBTTagCompound tag)
     {
-        return true;
+        return TieredCrusherRecipe.loadFromNBT(tag);
     }
 
     @Override
@@ -180,9 +229,12 @@ public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> im
     {
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
-    public void onProcessFinish(MultiblockProcess<CrusherRecipe> process)
+    @Nullable
+    public TieredCrusherRecipe findRecipeForInsertion(ItemStack inserting)
     {
+        return TieredCrusherRecipe.findRecipe(inserting, tier);
     }
 
     @Override
@@ -198,9 +250,9 @@ public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> im
     }
 
     @Override
-    public float getMinProcessDistance(MultiblockProcess<CrusherRecipe> process)
+    public boolean additionalCanProcessCheck(MultiblockProcess<TieredCrusherRecipe> process)
     {
-        return 0;
+        return true;
     }
 
     @Override
@@ -210,27 +262,14 @@ public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> im
     }
 
     @Override
-    public int[] getCurrentProcessesStep()
+    public void onProcessFinish(MultiblockProcess<TieredCrusherRecipe> process)
     {
-        TECrusherTiered master = master();
-        if (master != this && master != null)
-            return master.getCurrentProcessesStep();
-        int[] ia = new int[processQueue.size() > 0 ? 1 : 0];
-        for (int i = 0; i < ia.length; i++)
-            ia[i] = processQueue.get(i).processTick;
-        return ia;
     }
 
     @Override
-    public int[] getCurrentProcessesMax()
+    public float getMinProcessDistance(MultiblockProcess<TieredCrusherRecipe> process)
     {
-        TECrusherTiered master = master();
-        if (master != this && master != null)
-            return master.getCurrentProcessesMax();
-        int[] ia = new int[processQueue.size() > 0 ? 1 : 0];
-        for (int i = 0; i < ia.length; i++)
-            ia[i] = processQueue.get(i).maxTicks;
-        return ia;
+        return 0;
     }
 
     @Override
@@ -426,51 +465,15 @@ public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> im
     }
 
     @Override
-    public void onEntityCollision(World world, Entity entity)
+    public int[] getCurrentProcessesStep()
     {
-        boolean bpos = pos == 16 || pos == 17 || pos == 18 || pos == 21 || pos == 22 || pos == 23 || pos == 26 || pos == 27 || pos == 28;
-        if (bpos && !world.isRemote && entity != null && !entity.isDead && !isRSDisabled())
-        {
-            TECrusherTiered master = master();
-            if (master == null)
-                return;
-            Vec3d center = new Vec3d(master.getPos()).add(.5, .75, .5);
-            AxisAlignedBB crusherInternal = new AxisAlignedBB(center.x - 1.0625, center.y, center.z - 1.0625, center.x + 1.0625, center.y + 1.25, center.z + 1.0625);
-            if (!entity.getEntityBoundingBox().intersects(crusherInternal))
-                return;
-            if (entity instanceof EntityItem && !((EntityItem) entity).getItem().isEmpty())
-            {
-                ItemStack stack = ((EntityItem) entity).getItem();
-                if (stack.isEmpty())
-                {
-                    return;
-                }
-                CrusherRecipe recipe = master.findRecipeForInsertion(stack);
-                if (recipe == null)
-                {
-                    return;
-                }
-                ItemStack displayStack = recipe.getDisplayStack(stack);
-                MultiblockProcess<CrusherRecipe> process = new MultiblockProcessInWorld<>(recipe, .5f, Utils.createNonNullItemStackListFromItemStack(displayStack));
-                if (master.addProcessToQueue(process, true, true))
-                {
-                    master.addProcessToQueue(process, false, true);
-                    stack.shrink(displayStack.getCount());
-                    if (stack.getCount() <= 0)
-                        entity.setDead();
-                }
-            }
-            else if (entity instanceof EntityLivingBase && (!(entity instanceof EntityPlayer) || !((EntityPlayer) entity).capabilities.disableDamage))
-            {
-                int consumed = master.energyStorage.extractEnergy(80, true);
-                if (consumed > 0)
-                {
-                    master.energyStorage.extractEnergy(consumed, false);
-                    EventHandler.addCrushingEntity((EntityLivingBase) entity, master);
-                    entity.attackEntityFrom(IEDamageSources.crusher, consumed / 20f);
-                }
-            }
-        }
+        TETieredCrusher master = master();
+        if (master != this && master != null)
+            return master.getCurrentProcessesStep();
+        int[] ia = new int[processQueue.size() > 0 ? 1 : 0];
+        for (int i = 0; i < ia.length; i++)
+            ia[i] = processQueue.get(i).processTick;
+        return ia;
     }
 
     @Override
@@ -506,19 +509,15 @@ public class TECrusherTiered extends TETiered<TECrusherTiered, CrusherRecipe> im
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+    public int[] getCurrentProcessesMax()
     {
-        if (pos > 30 && pos < 44 && pos % 5 > 0 && pos % 5 < 4 && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-        {
-            TECrusherTiered master = master();
-            if (master != null)
-            {
-                //noinspection unchecked
-                return (T) master.insertionHandler;
-            }
-            return null;
-        }
-        return super.getCapability(capability, facing);
+        TETieredCrusher master = master();
+        if (master != this && master != null)
+            return master.getCurrentProcessesMax();
+        int[] ia = new int[processQueue.size() > 0 ? 1 : 0];
+        for (int i = 0; i < ia.length; i++)
+            ia[i] = processQueue.get(i).maxTicks;
+        return ia;
     }
 
     @Override

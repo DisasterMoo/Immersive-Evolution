@@ -21,7 +21,7 @@ import blusunrize.immersiveengineering.common.blocks.ItemBlockIEBase;
 import blusunrize.immersiveengineering.common.blocks.TileEntityMultiblockPart;
 import blusunrize.immersiveengineering.common.blocks.metal.BlockTypes_MetalMultiblock;
 import blusunrize.immersiveengineering.common.blocks.metal.TileEntityMultiblockMetal;
-import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TECrusherTiered;
+import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TETieredCrusher;
 import mcp.MethodsReturnNonnullByDefault;
 
 @ParametersAreNonnullByDefault
@@ -73,7 +73,7 @@ public class TieredMultiblocks extends BlockIEMultiblock<BlockTypes_MetalMultibl
         switch (type)
         {
             case CRUSHER:
-                return new TECrusherTiered();
+                return new TETieredCrusher();
             default:
                 return null;
         }
@@ -92,7 +92,7 @@ public class TieredMultiblocks extends BlockIEMultiblock<BlockTypes_MetalMultibl
                 return true;
             }
 
-            if (te instanceof TECrusherTiered)
+            if (te instanceof TETieredCrusher)
             {
                 return tile.pos % 5 == 0 || tile.pos == 2 || tile.pos == 9 || tile.pos == 19 && side.getOpposite() == tile.facing;
             }
