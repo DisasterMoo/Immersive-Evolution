@@ -8,11 +8,11 @@
     }
   },
   "variants": {
-    "inventory,type=squeezer": [
+    "inventory,type=mark_iv": [
       {
-        "model": "immersiveengineering:metal_multiblock/squeezer.obj",
+        "model": "immersiveengineering:metal_multiblock/crusher.obj",
         "transform": {
-          "scale": 0.25,
+          "scale": 0.1875,
           "rotation": [
             {
               "x": 20
@@ -25,8 +25,7 @@
       }
     ],
     "type": {
-      "squeezer": {
-      }
+      "mark_iv": {}
     },
     "facing": {
       "north": {
@@ -58,17 +57,11 @@
     },
     "_1dynamicrender": {
       "false": {},
-      "true": {
-        "model": "immersiveengineering:metal_multiblock/squeezer_piston.obj"
-      }
+      "true": {"model": "immersiveengineering:metal_multiblock/crusher_drum.obj"}
     },
     "boolean0": {
-      "false": {
-        "model": "immersiveengineering:metal_multiblock/squeezer.obj"
-      },
-      "true": {
-        "model": "immersiveengineering:metal_multiblock/squeezer_mirrored.obj"
-      }
+      "false": {"model": "immersiveengineering:metal_multiblock/crusher.obj"},
+      "true": {"model": "immersiveengineering:metal_multiblock/crusher_mirrored.obj"}
     }
   }
 }

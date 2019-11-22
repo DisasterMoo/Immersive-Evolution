@@ -9,26 +9,26 @@ import blusunrize.immersiveengineering.api.MultiblockHandler;
 import blusunrize.immersiveengineering.api.crafting.IMultiblockRecipe;
 import blusunrize.immersiveengineering.common.blocks.metal.TileEntityMultiblockMetal;
 import disastermoo.immersiveevolution.EvolutionConfig;
+import disastermoo.immersiveevolution.common.blocks.multiblocks.EnumTier;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class TieredTileEntity<T extends TieredTileEntity<T, R>, R extends IMultiblockRecipe> extends TileEntityMultiblockMetal<T, R>
 {
     protected int cooldownRunOutEnergy;
-    protected int tier;
+    protected EnumTier tier;
 
-    public TieredTileEntity(MultiblockHandler.IMultiblock multiblockInstance, int[] structureDimensions, int energyCapacity, boolean redstoneControl, int tier)
+    public TieredTileEntity(MultiblockHandler.IMultiblock multiblockInstance, int[] structureDimensions, int energyCapacity, boolean redstoneControl, EnumTier tier)
     {
         super(multiblockInstance, structureDimensions, energyCapacity, redstoneControl);
         this.tier = tier;
         cooldownRunOutEnergy = 0;
-
     }
 
     @Override
     public void readCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
         super.readCustomNBT(nbt, descPacket);
-        this.tier = nbt.getInteger("tier");
+        this.tier = EnumTier.fromMeta(nbt.getInteger("tier"));
         cooldownRunOutEnergy = nbt.getInteger("cooldownRunOutEnergy");
     }
 
@@ -36,8 +36,13 @@ public abstract class TieredTileEntity<T extends TieredTileEntity<T, R>, R exten
     public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
         super.writeCustomNBT(nbt, descPacket);
-        nbt.setInteger("tier", tier);
+        nbt.setInteger("tier", tier.getMeta());
         nbt.setInteger("cooldownRunOutEnergy", cooldownRunOutEnergy);
+    }
+
+    public EnumTier getTier()
+    {
+        return tier;
     }
 
     @Override

@@ -38,6 +38,7 @@ import blusunrize.immersiveengineering.common.util.IESounds;
 import blusunrize.immersiveengineering.common.util.Utils;
 import disastermoo.immersiveevolution.api.crafting.TieredCrusherRecipe;
 import disastermoo.immersiveevolution.common.EventHandler;
+import disastermoo.immersiveevolution.common.blocks.multiblocks.EnumTier;
 import disastermoo.immersiveevolution.common.blocks.multiblocks.TieredCrusher;
 import mcp.MethodsReturnNonnullByDefault;
 
@@ -52,10 +53,10 @@ public class TETieredCrusher extends TieredTileEntity<TETieredCrusher, TieredCru
 
     public TETieredCrusher()
     {
-        this(1);
+        this(EnumTier.MARK_I);
     }
 
-    public TETieredCrusher(int tier)
+    public TETieredCrusher(EnumTier tier)
     {
         super(TieredCrusher.getInstance(tier), new int[] {3, 3, 5}, TieredCrusher.getEnergyCapacity(tier), true, tier);
     }

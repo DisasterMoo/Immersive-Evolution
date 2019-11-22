@@ -8,9 +8,9 @@
     }
   },
   "variants": {
-    "inventory,type=excavator": [
+    "inventory,type=mark_ii": [
       {
-        "model": "immersiveengineering:metal_multiblock/excavator.obj",
+        "model": "immersiveengineering:metal_multiblock/crusher.obj",
         "transform": {
           "scale": 0.1875,
           "rotation": [
@@ -18,20 +18,14 @@
               "x": 20
             },
             {
-              "y": 135
+              "y": -45
             }
-          ],
-          "translation": [
-            0.375,
-            0,
-            0
           ]
         }
       }
     ],
     "type": {
-      "excavator": {
-      }
+      "mark_ii": {}
     },
     "facing": {
       "north": {
@@ -63,11 +57,11 @@
     },
     "_1dynamicrender": {
       "false": {},
-      "true": {}
+      "true": {"model": "immersiveengineering:metal_multiblock/crusher_drum.obj"}
     },
     "boolean0": {
-      "false": {"model": "immersiveengineering:metal_multiblock/excavator.obj"},
-      "true": {"model": "immersiveengineering:metal_multiblock/excavator_mirrored.obj"}
+      "false": {"model": "immersiveengineering:metal_multiblock/crusher.obj"},
+      "true": {"model": "immersiveengineering:metal_multiblock/crusher_mirrored.obj"}
     }
   }
 }

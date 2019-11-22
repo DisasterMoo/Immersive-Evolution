@@ -28,7 +28,7 @@ public class TESRTieredCrusher extends TileEntitySpecialRenderer<TETieredCrusher
         final BlockRendererDispatcher blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
         BlockPos blockPos = te.getPos();
         IBlockState state = getWorld().getBlockState(blockPos);
-        if (state.getBlock() != EvolutionContent.MULTIBLOCKS)
+        if (state.getBlock() != EvolutionContent.CRUSHER)
             return;
         //noinspection deprecation
         state = state.getBlock().getActualState(state, getWorld(), blockPos);

@@ -5,8 +5,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import blusunrize.immersiveengineering.api.MultiblockHandler;
 import blusunrize.immersiveengineering.common.blocks.BlockIEBase;
-import blusunrize.immersiveengineering.common.blocks.metal.BlockTypes_MetalMultiblock;
-import disastermoo.immersiveevolution.common.blocks.TieredMultiblocks;
+import disastermoo.immersiveevolution.common.blocks.multiblocks.EnumTier;
 import disastermoo.immersiveevolution.common.blocks.multiblocks.TieredCrusher;
 import disastermoo.immersiveevolution.common.blocks.multiblocks.tileentities.TETieredCrusher;
 
@@ -15,11 +14,11 @@ import static disastermoo.immersiveevolution.ImmersiveEvolution.MOD_ID;
 @Mod.EventBusSubscriber(modid = MOD_ID)
 public final class EvolutionContent
 {
-    public static BlockIEBase<BlockTypes_MetalMultiblock> MULTIBLOCKS;
+    public static BlockIEBase<EnumTier> CRUSHER;
 
     static
     {
-        MULTIBLOCKS = new TieredMultiblocks();
+        CRUSHER = new TieredCrusher.CrusherBlock();
     }
 
     public static void preInit()
@@ -35,9 +34,9 @@ public final class EvolutionContent
     private static <T extends TileEntity> void registerTE(Class<T> te, String name)
     {
         TileEntity.register(MOD_ID + ":" + name, te);
-        for (int i = 1; i <= 5; i++)
+        for (EnumTier tier : EnumTier.values())
         {
-            MultiblockHandler.registerMultiblock(TieredCrusher.getInstance(i));
+            MultiblockHandler.registerMultiblock(TieredCrusher.getInstance(tier));
         }
     }
 }

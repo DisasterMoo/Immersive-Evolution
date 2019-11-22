@@ -19,6 +19,7 @@ import blusunrize.immersiveengineering.api.crafting.MultiblockRecipe;
 import blusunrize.immersiveengineering.common.util.ListUtils;
 import blusunrize.immersiveengineering.common.util.Utils;
 import disastermoo.immersiveevolution.EvolutionConfig;
+import disastermoo.immersiveevolution.common.blocks.multiblocks.EnumTier;
 import disastermoo.immersiveevolution.common.blocks.multiblocks.TieredCrusher;
 
 @SuppressWarnings("WeakerAccess")
@@ -27,7 +28,7 @@ public class TieredCrusherRecipe extends MultiblockRecipe
     // How many ticks are needed to crush ores of the same tier
     public static ArrayList<TieredCrusherRecipe> RECIPE_LIST = new ArrayList<>();
 
-    public static TieredCrusherRecipe addRecipe(ItemStack output, Object input, int requiredTier)
+    public static TieredCrusherRecipe addRecipe(ItemStack output, Object input, EnumTier requiredTier)
     {
         TieredCrusherRecipe r = new TieredCrusherRecipe(output, input, requiredTier);
         if (r.input != null && !r.output.isEmpty())
@@ -35,11 +36,11 @@ public class TieredCrusherRecipe extends MultiblockRecipe
         return r;
     }
 
-    public static TieredCrusherRecipe findRecipe(ItemStack input, int machineTier)
+    public static TieredCrusherRecipe findRecipe(ItemStack input, EnumTier machineTier)
     {
         for (TieredCrusherRecipe recipe : RECIPE_LIST)
         {
-            if (recipe.input.matchesItemStack(input) && recipe.requiredTier <= machineTier)
+            if (recipe.input.matchesItemStack(input) && machineTier.isAtLeast(recipe.requiredTier))
             {
                 TieredCrusherRecipe recipeClone = new TieredCrusherRecipe(recipe.output, recipe.input, recipe.requiredTier);
                 recipeClone.currentTier = machineTier;
@@ -86,10 +87,10 @@ public class TieredCrusherRecipe extends MultiblockRecipe
     public static TieredCrusherRecipe loadFromNBT(NBTTagCompound nbt)
     {
         IngredientStack input = IngredientStack.readFromNBT(nbt.getCompoundTag("input"));
-        int currentTier = nbt.getInteger("currentTier");
+        EnumTier currentTier = EnumTier.fromNBT(nbt);
         for (TieredCrusherRecipe recipe : RECIPE_LIST)
         {
-            if (recipe.input.equals(input) && recipe.requiredTier <= currentTier)
+            if (recipe.input.equals(input) && currentTier.isAtLeast(recipe.requiredTier))
             {
                 TieredCrusherRecipe recipeClone = new TieredCrusherRecipe(recipe.output, recipe.input, recipe.requiredTier);
                 recipeClone.currentTier = currentTier;
@@ -104,10 +105,10 @@ public class TieredCrusherRecipe extends MultiblockRecipe
     private final ItemStack output;
     private ItemStack[] secondaryOutput;
     private float[] secondaryChance;
-    private int requiredTier;
-    private int currentTier;
+    private EnumTier requiredTier;
+    private EnumTier currentTier;
 
-    public TieredCrusherRecipe(ItemStack output, Object input, int requiredTier)
+    public TieredCrusherRecipe(ItemStack output, Object input, EnumTier requiredTier)
     {
         this.output = output;
         this.input = ApiUtils.createIngredientStack(input);
@@ -123,12 +124,15 @@ public class TieredCrusherRecipe extends MultiblockRecipe
     @Override
     public NonNullList<ItemStack> getActualItemOutputs(TileEntity tile)
     {
+        float bonusChance = (currentTier.getMeta() - requiredTier.getMeta()) * 0.1f;
         NonNullList<ItemStack> list = NonNullList.create();
         list.add(output);
         if (secondaryOutput != null && secondaryChance != null)
+        {
             for (int i = 0; i < secondaryOutput.length; i++)
-                if (Utils.RAND.nextFloat() < secondaryChance[i])
+                if (Utils.RAND.nextFloat() < secondaryChance[i] + bonusChance)
                     list.add(secondaryOutput[i]);
+        }
         return list;
     }
 
@@ -142,7 +146,7 @@ public class TieredCrusherRecipe extends MultiblockRecipe
     public NBTTagCompound writeToNBT(NBTTagCompound nbt)
     {
         nbt.setTag("input", input.writeToNBT(new NBTTagCompound()));
-        nbt.setInteger("currentTier", currentTier);
+        currentTier.toNBT(nbt);
         return nbt;
     }
 
@@ -188,7 +192,7 @@ public class TieredCrusherRecipe extends MultiblockRecipe
     @Override
     public int getTotalProcessTime()
     {
-        double tierModifier = Math.pow(0.5f, (currentTier - requiredTier));
+        double tierModifier = Math.pow(0.5f, (currentTier.getMeta() - requiredTier.getMeta()));
         return (int) Math.max(1, EvolutionConfig.CRUSHER.ticks * tierModifier);
     }
 
